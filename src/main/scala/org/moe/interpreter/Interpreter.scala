@@ -70,14 +70,7 @@ class Interpreter {
           case _ => throw new MoeErrors.UnexpectedType("MoeArrayObject expected")
         }
 
-        array_value.callMethod(
-          array_value.getAssociatedClass.getOrElse(
-            throw new MoeErrors.ClassNotFound("Array")
-          ).getMethod("postcircumfix:<[]>").getOrElse(
-            throw new MoeErrors.MethodNotFound("postcircumfix:<[]>")
-          ), 
-          List(index_result)
-        )
+        array_value.callMethod("postcircumfix:<[]>", List(index_result))
       }
 
       case PairLiteralNode(key, value) => getPair(
@@ -93,14 +86,7 @@ class Interpreter {
           case _ => throw new MoeErrors.UnexpectedType("MoeHashObject expected")
         }
 
-        hash_map.callMethod(
-          hash_map.getAssociatedClass.getOrElse(
-            throw new MoeErrors.ClassNotFound("Hash")
-          ).getMethod("postcircumfix:<{}>").getOrElse(
-            throw new MoeErrors.MethodNotFound("postcircumfix:<{}>")
-          ), 
-          List(key_result)
-        )
+        hash_map.callMethod("postcircumfix:<{}>", List(key_result))
       }
 
       case RangeLiteralNode(start, end) => {
@@ -137,26 +123,12 @@ class Interpreter {
 
       case PrefixUnaryOpNode(lhs: AST, operator: String) => {
         val receiver = eval(runtime, env, lhs)
-        receiver.callMethod(
-          receiver.getAssociatedClass.getOrElse(
-            throw new MoeErrors.ClassNotFound(receiver.toString)
-          ).getMethod("prefix:<" + operator + ">").getOrElse(
-            throw new MoeErrors.MethodNotFound("method prefix:<" + operator + "> missing in class " + receiver.getClassName)
-          ),
-          List()
-        )
+        receiver.callMethod("prefix:<" + operator + ">", List())
       }
 
       case PostfixUnaryOpNode(lhs: AST, operator: String) => {
         val receiver = eval(runtime, env, lhs)
-        receiver.callMethod(
-          receiver.getAssociatedClass.getOrElse(
-            throw new MoeErrors.ClassNotFound(receiver.toString)
-          ).getMethod("postfix:<" + operator + ">").getOrElse(
-            throw new MoeErrors.MethodNotFound("method postfix:<" + operator + "> missing in class " + receiver.getClassName)
-          ), 
-          List()
-        )
+        receiver.callMethod("postfix:<" + operator + ">", List())
       }
 
       // binary operators
@@ -164,14 +136,7 @@ class Interpreter {
       case BinaryOpNode(lhs: AST, operator: String, rhs: AST) => {
         val receiver = eval(runtime, env, lhs)
         val arg      = eval(runtime, env, rhs)
-        receiver.callMethod(
-          receiver.getAssociatedClass.getOrElse(
-            throw new MoeErrors.ClassNotFound(receiver.toString)
-          ).getMethod("infix:<" + operator + ">").getOrElse(
-            throw new MoeErrors.MethodNotFound("method infix:<" + operator + "> missing in class " + receiver.getClassName)
-          ), 
-          List(arg)
-        )
+        receiver.callMethod("infix:<" + operator + ">", List(arg))
       }
 
       // short circuit binary operators
@@ -180,14 +145,7 @@ class Interpreter {
       case ShortCircuitBinaryOpNode(lhs: AST, operator: String, rhs: AST) => {
         val receiver = eval(runtime, env, lhs)
         val arg      = new MoeLazyEval(this, runtime, env, rhs)
-        receiver.callMethod(
-          receiver.getAssociatedClass.getOrElse(
-            throw new MoeErrors.ClassNotFound(receiver.toString)
-          ).getMethod("infix:<" + operator + ">").getOrElse(
-            throw new MoeErrors.MethodNotFound("method infix:<" + operator + "> missing in class " + receiver.getClassName)
-          ), 
-          List(arg)
-        )
+        receiver.callMethod("infix:<" + operator + ">", List(arg))
       }
 
       // ternary operator
@@ -196,14 +154,7 @@ class Interpreter {
         val receiver = eval(runtime, env, cond)
         val argTrue  = new MoeLazyEval(this, runtime, env, trueExpr)
         val argFalse = new MoeLazyEval(this, runtime, env, falseExpr)
-        receiver.callMethod(
-          receiver.getAssociatedClass.getOrElse(
-            throw new MoeErrors.ClassNotFound(receiver.toString)
-          ).getMethod("infix:<?:>").getOrElse(
-            throw new MoeErrors.MethodNotFound("method infix:<?:> missing in class " + receiver.getClassName)
-          ),
-          List(argTrue, argFalse)
-        )
+        receiver.callMethod("infix:<?:>", List(argTrue, argFalse))
       }
 
       // value lookup, assignment and declaration

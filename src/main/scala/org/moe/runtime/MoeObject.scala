@@ -98,6 +98,16 @@ class MoeObject(
    */
   def callMethod(method: MoeMethod, args: List[MoeObject]): MoeObject = method.execute(new MoeArguments(args, Some(this)))
 
+  def callMethod(methodName: String, args: List[MoeObject]): MoeObject =
+    callMethod(
+      this.getAssociatedClass.getOrElse(
+        throw new MoeErrors.ClassNotFound(this.toString)
+      ).getMethod(methodName).getOrElse(
+        throw new MoeErrors.MethodNotFound("method " + methodName + " missing in class " + this.getClassName)
+      ),
+      args
+    )
+
   /**
    * Returns true.
    */
