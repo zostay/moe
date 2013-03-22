@@ -108,4 +108,28 @@ class MoeStrObject(
   override def unboxToInt: Try[Int] = Try(getNativeValue.toInt)
   override def unboxToDouble: Try[Double] = Try(getNativeValue.toDouble)
 
+  // coercing
+
+  def toInt(r: MoeRuntime): MoeIntObject =
+    r.NativeObjects.getInt(
+      unboxToInt match {
+        case Success(i) => i
+        case Failure(e) => 0
+      }
+    )
+
+  def toNum(r: MoeRuntime): MoeNumObject =
+    r.NativeObjects.getNum(
+      unboxToDouble match {
+        case Success(d) => d
+        case Failure(e) => 0.0
+      }
+    )
+
+  def coerce(r: MoeRuntime, ctx: MoeContext): MoeObject =
+    ctx match {
+      case MoeIntContext() => toInt(r)
+      case MoeNumContext() => toNum(r)
+      case _               => throw new MoeErrors.CannotCoerceError(this.toString)
+    }
 }

@@ -28,7 +28,7 @@ object InterpreterUtils {
       case PrefixUnaryOpNode(receiver, _)     => walkAST(receiver, callback)
       case PostfixUnaryOpNode(receiver, _)    => walkAST(receiver, callback)
 
-      case BinaryOpNode(lhs, _, rhs) => {
+      case BinaryOpNode(lhs, _, rhs, ctx) => {
         walkAST(lhs, callback)
         walkAST(rhs, callback)
       }

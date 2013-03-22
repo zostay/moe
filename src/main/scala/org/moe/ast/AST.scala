@@ -51,7 +51,8 @@ case class PostfixUnaryOpNode(rhs: AST, operator: String) extends AST
 
 // binary operators
 
-case class BinaryOpNode(lhs: AST, operator: String, rhs: AST) extends AST
+// case class BinaryOpNode(lhs: AST, operator: String, rhs: AST, ctx: Option[MoeContext] = None) extends AST
+case class BinaryOpNode(lhs: AST, operator: String, rhs: AST, ctx: MoeContext = new MoeNoContext()) extends AST
 case class ShortCircuitBinaryOpNode(lhs: AST, operator: String, rhs: AST) extends AST
 
 // ternary operator

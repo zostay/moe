@@ -10,7 +10,7 @@ class Interpreter {
 
   val stub = new MoeObject()
 
-  def eval(runtime: MoeRuntime, env: MoeEnvironment, node: AST): MoeObject = {
+  def eval(runtime: MoeRuntime, env: MoeEnvironment, node: AST, ctx: MoeContext = new MoeNoContext()): MoeObject = {
 
     // no need to do all that typing ..
     import runtime.NativeObjects._
@@ -42,7 +42,14 @@ class Interpreter {
 
       case IntLiteralNode(value)     => getInt(value)
       case FloatLiteralNode(value)   => getNum(value)
-      case StringLiteralNode(value)  => getStr(value)
+      case StringLiteralNode(value)  => {
+        val str = getStr(value)
+        ctx match {
+          case MoeNoContext()  => str
+          case MoeStrContext() => str
+          case _               => str.coerce(runtime, ctx)
+        }
+      }
       case BooleanLiteralNode(value) => getBool(value)
 
       case UndefLiteralNode() => getUndef
@@ -133,9 +140,9 @@ class Interpreter {
 
       // binary operators
 
-      case BinaryOpNode(lhs: AST, operator: String, rhs: AST) => {
-        val receiver = eval(runtime, env, lhs)
-        val arg      = eval(runtime, env, rhs)
+      case BinaryOpNode(lhs: AST, operator: String, rhs: AST, ctx: MoeContext) => {
+        val receiver = eval(runtime, env, lhs, ctx)
+        val arg      = eval(runtime, env, rhs, ctx)
         receiver.callMethod("infix:<" + operator + ">", List(arg))
       }
 

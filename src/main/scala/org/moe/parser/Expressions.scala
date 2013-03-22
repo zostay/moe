@@ -4,6 +4,7 @@ import ParserUtils._
 
 import scala.util.parsing.combinator._
 import org.moe.ast._
+import org.moe.runtime._
 
 trait Expressions extends Literals with JavaTokenParsers with PackratParsers {
 
@@ -72,7 +73,9 @@ trait Expressions extends Literals with JavaTokenParsers with PackratParsers {
 
   // left        + - .
   lazy val addOp: PackratParser[AST] = addOp ~ "[-+.]".r ~ mulOp            ^^ {
-    case left ~ op ~ right => BinaryOpNode(left, op, right)
+    case left ~ "." ~ right => BinaryOpNode(left, ".", right, new MoeStrContext())
+    // TODO: Int vs Num
+    case left ~ op ~ right => BinaryOpNode(left, op, right, new MoeIntContext())
   } | mulOp
 
   // left        * / % x

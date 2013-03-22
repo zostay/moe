@@ -63,7 +63,7 @@ object Serializer {
       )
     )
 
-    case BinaryOpNode(lhs, operator, rhs) => JSONObject(
+    case BinaryOpNode(lhs, operator, rhs, ctx) => JSONObject(
       Map(
         "BinaryOpNode" -> JSONObject(
           Map(
@@ -77,7 +77,7 @@ object Serializer {
 
     case TernaryOpNode(condExpr, trueExpr, falseExpr) => JSONObject(
       Map(
-        "BinaryOpNode" -> JSONObject(
+        "TernaryOpNode" -> JSONObject(
           Map(
             "condition" -> toJSON(condExpr),
             "trueExpr"  -> toJSON(trueExpr),
